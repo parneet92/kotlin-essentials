@@ -2,6 +2,7 @@ package org.example.com.rockthejvm.practice
 
 import java.awt.image.BufferedImage
 import java.io.File
+import java.util.HexFormat
 import javax.imageio.ImageIO
 
 // manipulating images
@@ -40,6 +41,21 @@ class Color(r: Int, g: Int, b: Int) {
         image.setRGB(0, 0, width, height, pixels, 0, width)
         ImageIO.write(image, "JPG", File(path))
     }
+
+    companion object {
+        val BLACK = Color(0, 0 , 0)
+        val RED = Color(255, 0 , 0)
+        val YELLOw = Color(255, 255, 0)
+
+        fun fromHex(hexValue: Int): Color {
+            // 0x00ff0000
+            // 00000000111111110000000000000001
+            val red = (hexValue and 0xff0000) shr 16
+            val green = (hexValue and 0xFF00) shr 8
+            val blue = hexValue and 0xff
+            return Color(red, green, blue)
+        }
+    }
 }
 
 fun drawColor(width: Int, height: Int, path: String) {
@@ -49,6 +65,13 @@ fun drawColor(width: Int, height: Int, path: String) {
     ImageIO.write(image, "JPG", File(path))
 }
 
+/*
+    Exercise: create a companion object for color so that you can write
+        COLOR.BLACK, COLOR.RED,.....
+        COLOR.fromHex(int) : Color Instance out of that
+
+ */
+
 fun main(){
 
     val test: Int = 1 // 100000
@@ -57,4 +80,6 @@ fun main(){
     magenta.draw(20, 20, "src/main/resources/magenta.jpg")
     val randomColor = Color(255, 255 , 0)
     randomColor.draw(20, 20, "src/main/resources/randomColor.jpg")
+
+    Color.fromHex(0xEDEDED).draw(20, 20, "src/main/resources/ed.jpg")
 }

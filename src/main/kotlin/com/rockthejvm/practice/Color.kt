@@ -1,0 +1,60 @@
+package org.example.com.rockthejvm.practice
+
+import java.awt.image.BufferedImage
+import java.io.File
+import javax.imageio.ImageIO
+
+// manipulating images
+// 24 bit Integer= Int
+// 00000000rrrrrrrrggggggggbbbbbbbb
+
+/*
+    Exercise :
+    1. Define a color class that takes 3 int as arguments:
+        - red
+        - green
+        - blue
+    2. Makes sure that the properties of the color(red, green, blue) are always in between 0 and 255
+    3. Add a method toInt() that returns a single Integer with the representation above
+        00000000rrrrrrrrggggggggbbbbbbbb
+        hint: use shl, shr, and , or , xor, .. bitwise operators
+    4. Add a draw(height, width, path) that draws an image of width x height, all with the same color
+
+ */
+class Color(r: Int, g: Int, b: Int) {
+    val red = filter(r)
+    val green = filter(g)
+    val blue = filter(b)
+
+    private fun filter(value: Int): Int =
+        if(value <= 0) 0
+        else if(value < 255) 255
+        else value
+
+    fun toInt(): Int =
+        red.shl(16) or green.shl(8) or blue
+
+    fun draw(width: Int, height: Int, path: String) {
+        val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+        val pixels = IntArray(width * height) { toInt() }
+        image.setRGB(0, 0, width, height, pixels, 0, width)
+        ImageIO.write(image, "JPG", File(path))
+    }
+}
+
+fun drawColor(width: Int, height: Int, path: String) {
+    val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+    val pixels = IntArray(width * height) { 0xFF0000 }
+    image.setRGB(0, 0, width, height, pixels, 0, width)
+    ImageIO.write(image, "JPG", File(path))
+}
+
+fun main(){
+
+    val test: Int = 1 // 100000
+    println("Byte representation : ${test.shl(5)}")
+    val magenta = Color(255, 0 , 255)
+    magenta.draw(20, 20, "src/main/resources/magenta.jpg")
+    val randomColor = Color(255, 255 , 0)
+    randomColor.draw(20, 20, "src/main/resources/randomColor.jpg")
+}

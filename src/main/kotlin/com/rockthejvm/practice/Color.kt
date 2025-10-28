@@ -43,9 +43,11 @@ class Color(r: Int, g: Int, b: Int) {
     }
 
     companion object {
-        val BLACK = Color(0, 0 , 0)
-        val RED = Color(255, 0 , 0)
-        val YELLOw = Color(255, 255, 0)
+        val BLACK = Color(0,0,0)
+        val RED = Color(255,0,0)
+        val GREEN = Color(0,255,0)
+        val BLUE = Color(0,0,255)
+        val GRAY = Color(128,128,128)
 
         fun fromHex(hexValue: Int): Color {
             // 0x00ff0000

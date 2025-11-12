@@ -1,11 +1,12 @@
 package org.example.com.rockthejvm.practice
 
+import java.awt.Graphics
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
 // crop a picture
-class Image(val buffImage: BufferedImage) {
+class Image(private val buffImage: BufferedImage) { // Never expose mutable state outside this class
 
     val width = buffImage.width
     val height = buffImage.height
@@ -40,6 +41,10 @@ class Image(val buffImage: BufferedImage) {
         }
     }
 
+    fun draw(g: Graphics) {
+        g.drawImage(buffImage, 0, 0, null)
+    }
+
     companion object {
 
         fun black(width: Int, height: Int): Image {
@@ -61,6 +66,6 @@ object ImagePlayground {
     @JvmStatic
     fun main(args: Array<String>) {
         Image.black(100, 100).saveResource("black.jpg")
-        Image.loadResource("wikicrop.jpg").crop(480, 180, 350, 180)?.saveResource("cropped.jpg")
+        Image.loadResource("IMG_3397.jpg").crop(480, 180, 350, 180)?.saveResource("cropped.jpg")
     }
 }

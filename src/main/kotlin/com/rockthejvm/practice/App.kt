@@ -2,13 +2,14 @@ package org.example.com.rockthejvm.practice
 
 import java.awt.Dimension
 import java.awt.Graphics
-import java.awt.event.HierarchyBoundsListener
+import java.util.Scanner
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.WindowConstants
+import kotlin.system.exitProcess
 
 // Java Swing
-object UI {
+object App {
 
     private lateinit var frame: JFrame
     private lateinit var imagePanel: ImagePanel
@@ -29,6 +30,8 @@ object UI {
             repaint()
 
         }
+
+        fun getImage(): Image = image
     }
 
     fun loadResource(path: String) {
@@ -49,8 +52,33 @@ object UI {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        loadResource("IMG_3397.jpg")
-        Thread.sleep(3000)
-        loadResource("cropped.jpg")
+       val scanner = Scanner(System.`in`)
+        while (true){
+            print("> ")
+            val command = scanner.nextLine()
+            /*
+                TODO
+                    "load wikicrop.jpg -> load this path into the UI
+                    "save newPicture.jpg" -> save the current image to this path
+                    "exit" -> exitProcess(0)
+
+             */
+            val words = command.split(" ")
+            val action = words[0]
+            when(action){
+                "load" -> try{
+                            loadResource(words[1])
+                          }catch (e: Exception){
+                              println("Error : cannot load image at path ${words[1]}.")
+                          }
+                "save" -> if(!this::frame.isInitialized)
+                            println("Error! No image loaded")
+                          else
+                            imagePanel.getImage().saveResource(words[1])
+                "exit" -> exitProcess(0)
+            }
+
+        }
+
     }
 }

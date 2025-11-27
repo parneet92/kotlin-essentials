@@ -11,6 +11,12 @@ class Image(private val buffImage: BufferedImage) { // Never expose mutable stat
     val width = buffImage.width
     val height = buffImage.height
 
+    fun getColor(x: Int, y: Int): Color =
+        Color.fromHex(buffImage.getRGB(x, y))
+
+    fun setColor(x: Int, y: Int, color: Color) =
+        buffImage.setRGB(x, y, color.toInt())
+
     fun save(path: String) =
         ImageIO.write(buffImage, "JPG", File(path))
 

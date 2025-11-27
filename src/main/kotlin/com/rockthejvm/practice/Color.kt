@@ -76,12 +76,13 @@ fun drawColor(width: Int, height: Int, path: String) {
 
 fun main(){
 
-    val test: Int = 1 // 100000
+    /*val test: Int = 1 // 100000
     println("Byte representation : ${test.shl(5)}")
     val magenta = Color(255, 0 , 255)
     magenta.draw(20, 20, "src/main/resources/magenta.jpg")
     val randomColor = Color(255, 255 , 0)
     randomColor.draw(20, 20, "src/main/resources/randomColor.jpg")
 
-    Color.fromHex(0xEDEDED).draw(20, 20, "src/main/resources/ed.jpg")
+    Color.fromHex(0xEDEDED).draw(20, 20, "src/main/resources/ed.jpg")*/
+    Color.BLUE.draw(1693, 2554, "src/main/resources/blue.jpg")
 }

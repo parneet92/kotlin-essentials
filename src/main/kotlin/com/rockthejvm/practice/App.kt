@@ -76,6 +76,18 @@ object App {
                           else
                             imagePanel.getImage().saveResource(words[1])
                 "exit" -> exitProcess(0)
+                /*
+                    1. Use transformation.parse(command)
+                    2. run the transformation on the current image -> a new image
+                    3. replace the current image with the new image
+                 */
+                else -> {
+                    val transformation = Transformation.parse(command)
+                    val newImage = transformation.process(imagePanel.getImage())
+                    imagePanel.replaceImage(newImage)
+                    frame.pack()    // have the windows specifically sized for the new image
+                }
+
             }
 
         }

@@ -16,6 +16,8 @@ import java.io.IOException
         - parse("blend paris.jpg transparency")->Blend(Image(..), Transparency)
         - parse("master yoda") -> Noop
     4. Application main method.
+    5. Parse transformations in the main app
+    6. Implement the transformations
  */
 
 interface Transformation {
@@ -58,16 +60,40 @@ interface Transformation {
 }
 
 class Crop(private val x: Int, private val y: Int, private val width: Int, private val height: Int): Transformation{
-    override fun process(image: Image): Image {
-        println("Calling Crop process method")
-        return image
-    }
+    override fun process(image: Image): Image =
+        try {
+            image.crop(x, y, width, height)!!
+        } catch (e: Exception) {
+            println(" Error : Coordinates are out of bounds, Max coordinates: ${image.width} x ${image.height}")
+            image
+        }
+
 }
 
+/*
+    1. Make sure that the images have the exact same dimesnsions
+    2. Create a black image from the dimensions
+    3. For every pixel in fgImage with every corresponding pixel in bgImage, use the blend mode to
+        combine the colors
+        write that pixel in those coordinates in the resulting image
+    4. Return the image
+ */
 class Blend(private val fgImage: Image, private val blendMode: BlendMode): Transformation{
     override fun process(bgImage: Image): Image {
-        println("Calling Blend process method")
-        return bgImage
+        if(fgImage.height != bgImage.height || fgImage.width != bgImage.width){
+            println("Error: Images don't have the same sizes: ${fgImage.width} x ${fgImage.height} vs  ${bgImage.width} x ${bgImage.height}")
+            return bgImage
+        }
+
+        val resultingImage = Image.black(bgImage.width, bgImage.height)
+        for( x in 0 ..< resultingImage.width){
+            for( y in 0 ..< resultingImage.height){
+                val combinedColor = blendMode.combine(fgImage.getColor(x,y), bgImage.getColor(x, y))
+                resultingImage.setColor(x, y, combinedColor)
+            }
+        }
+        return resultingImage
+
     }
 }
 

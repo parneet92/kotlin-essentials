@@ -83,7 +83,7 @@ object App {
                  */
                 else -> {
                     val transformation = Transformation.parse(command)
-                    val newImage = transformation.process(imagePanel.getImage())
+                    val newImage = transformation(imagePanel.getImage())
                     imagePanel.replaceImage(newImage)
                     frame.pack()    // have the windows specifically sized for the new image
                 }

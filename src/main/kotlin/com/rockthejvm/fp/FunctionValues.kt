@@ -75,5 +75,47 @@ object FunctionValues {
         // multi arg LAMBDA
         val adderFun = { a:Int, b: Int -> a+b }
         val adderFunV2: (Int, Int) -> Int = { a,b -> a+b }
+
+        /*
+            Exercises :
+            1. Write a function to combine all the elements of a list, using a combination function that you pass as arguments
+                "reduce"
+               reduce([1,2,3,4], +, 0) = 10
+               reduce([1,2,3,4], a,b => a*b,1) = 24
+            2. Learn to use APIs that use Lambdas
+                sort a list of strings by their lengths by using standard api functions
+         */
+
+        fun <A> reduce(list: List<A>, op: (A, A) -> A , seed: A): A {
+            var result = seed
+            for(n in list)
+                result = op(result, n)
+            return result
+        }
+
+        fun <A> reduce1(list: List<A>, seed: A, op: (A, A) -> A ): A {
+            var result = seed
+            for(n in list)
+                result = op(result, n)
+            return result
+        }
+
+        tailrec fun <A> reduceRec(list: List<A>, seed: A, op: (A, A) -> A ): A =
+            if(list.isEmpty()) seed
+            else reduceRec(list.drop(1), op(seed, list[0]), op)
+
+        println(reduce(numbers, {a: Int,b: Int -> a+b}, 0))
+        println(reduce(numbers, {a: Int,b: Int -> a*b}, 1))
+        println(reduce(listOf("I", "Love","Kotlin"), { a,b -> "$a $b" }, ""))
+
+        println(reduce1(numbers,0) {a: Int,b: Int -> a+b})  // if the lambda is in last in the function definition then you can write it outside the paranthesis
+        println(reduceRec(listOf("I", "Love","Kotlin"),"") { a,b -> "$a $b" })
+
+        //2
+        val list2 = listOf("hello","you","piece","of","Kartoffel")
+        val sortedList = list2.sortedWith { a,b -> a.length - b.length }
+        val sortedList2 = list2.sortedBy { it.length }  // same as above but bit better
+        println(sortedList)
+
     }
 }

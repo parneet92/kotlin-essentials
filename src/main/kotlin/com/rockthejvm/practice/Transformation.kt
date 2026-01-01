@@ -53,6 +53,8 @@ interface Transformation {
                         println("Invalid blend format. Usage: `blend [path] [mode]`")
                         Noop
                     }
+                "invert" -> Invert
+                "grayscale" -> GrayScale
                 else -> Noop
             }
         }
@@ -96,6 +98,47 @@ class Blend(private val fgImage: Image, private val blendMode: BlendMode): Trans
 
     }
 }
+
+abstract class PixelTransformation(val pixelTransformer: (Color) -> Color): Transformation {
+    override fun invoke(image: Image): Image {
+        val resultingImage = Image.black(image.width, image.height)
+        for(x in 0 ..< image.width){
+            for(y in 0 ..< image.height){
+                val originalColor = image.getColor(x, y)
+                val invertedColor = pixelTransformer(originalColor)
+                resultingImage.setColor(x, y , invertedColor)
+            }
+        }
+        return resultingImage
+    }
+}
+
+object Invert: PixelTransformation({ color ->
+    Color(
+        255 - color.red,
+        255 - color.green,
+        255 - color.blue
+    )
+})
+
+object GrayScale: PixelTransformation({ color ->
+    val avg = (color.red + color.green + color.blue) / 3
+    Color(
+        avg,
+        avg,
+        avg
+    )   // last expression is the value of the LAMBDA
+})
+
+/*
+    Exercises :
+    A. Create an invert and grayscale transformation
+        invert : for every pixel, return a new pixel where r/g/b values are 255-r/g/b of the original pixel
+        grayscale: for every pixel, return a new pixel where r=g=b = the average of r/g/b of the original pixel
+    B. Add them in the transformation parse method
+    C. Test them out
+    D.Refactor them
+ */
 
 object Noop: Transformation{
     override fun invoke(image: Image): Image {

@@ -47,6 +47,35 @@ class Image(private val buffImage: BufferedImage) { // Never expose mutable stat
         }
     }
 
+    fun window(xc: Int, yc: Int, width: Int, height: Int): Window {
+        val offsetX = (width - 1)/2
+        val offsetY = (height - 1)/2
+
+        val horizontalCoord = ((xc - offsetX) .. (xc+offsetX))
+            .map {
+                x ->
+                    if(x <= 0) 0
+                    else if(x >= this.width) this.width - 1
+                    else x
+            }
+
+        val verticalCoord = ((yc - offsetY) .. (yc+offsetY))
+            .map {
+                    y ->
+                if(y <= 0) 0
+                else if(y >= this.height) this.height - 1
+                else y
+            }
+        val colors = verticalCoord.flatMap {
+            y -> horizontalCoord
+                .map {
+                    x -> getColor(x,y)
+                }
+        }
+        return Window(width, height,colors)
+
+    }
+
     fun draw(g: Graphics) {
         g.drawImage(buffImage, 0, 0, null)
     }
@@ -65,6 +94,13 @@ class Image(private val buffImage: BufferedImage) { // Never expose mutable stat
 
         fun loadResource(path: String) =
             load("src/main/resources/$path")
+
+        fun fromColors(width: Int, height: Int, colors: List<Color>): Image {
+            val buffImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+            val pixels = colors.map { it.toInt() }.toIntArray()
+            buffImage.setRGB(0, 0, width, height,pixels, 0 , width)
+            return Image(buffImage)
+        }
     }
 }
 

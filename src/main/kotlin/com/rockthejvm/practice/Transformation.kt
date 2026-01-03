@@ -55,6 +55,10 @@ interface Transformation {
                     }
                 "invert" -> Invert
                 "grayscale" -> GrayScale
+                "sharpen" -> KernelFilter(Kernel.sharpen)
+                "blur" -> KernelFilter(Kernel.blur)
+                "edge" -> KernelFilter(Kernel.edge)
+                "emboss" -> KernelFilter(Kernel.emboss)
                 else -> Noop
             }
         }
@@ -145,4 +149,123 @@ object Noop: Transformation{
         println("Calling no op [process method")
         return image
     }
+}
+
+// kernel transformation
+// 1 - window
+/*
+    +---------------------------+
+    |                           |
+    |                           |
+    |       A1 A2 A3            |
+ y >|       B1 XX B3            |
+    |       C1 C2 C3            |
+    |                           |
+    |                           |
+    +---------------------------+
+                ^
+                x
+     Window(3,3, [A1,A2,A3, B1,XX,B3, C1,C2,C3])
+
+     Imagine the whole rectangle as image and the window has a width and height of 3
+     we need to pick the window centered at x,y
+ */
+data class Window(val width: Int, val height: Int, val values: List<Color>)
+data class Kernel(val width: Int, val height: Int, val values: List<Double>) {
+    // property: all the values should sum up to 1.0
+
+    fun normalize(): Kernel{
+        val sum = values.sum()
+        if( sum == 0.0) return this
+        return Kernel(width, height, values.map { it/sum })
+    }
+
+    // window and kernel must have the same width and height
+    // multiply every pixel with every corresponding double
+    // [a,b,c] * {x,y,z] = [a*x,b*y,c*z]
+    // sum up all the values to a single color - a*x+b*y+c*z
+    // " it's called convolution in image processing
+    operator fun times(window: Window): Color {
+        if (width != window.width || height != window.height)
+            throw IllegalArgumentException("Kernel and windows must have same dimensions")
+        val red = window.values
+            .map { it.red }
+            .zip(values) { a,b -> a * b }
+            .sum()
+        val green = window.values
+            .map { it.green }
+            .zip(values) { a,b -> a * b }
+            .sum()
+        val blue = window.values
+            .map { it.blue }
+            .zip(values) { a,b -> a * b }
+            .sum()
+        return Color(red.toInt(), green.toInt(), blue.toInt())
+    }
+
+    companion object {
+        val sharpen = Kernel(3,3, listOf(
+            0.0 , -1.0, 0.0,
+            -1.0, 5.0, -1.0,
+            0.0, -1.0, 0.0
+        ) ).normalize()
+
+        val blur = Kernel(3,3, listOf(
+            1.0, 2.0 , 1.0,
+            2.0, 4.0, 2.0,
+            1.0, 2.0 , 1.0
+        ) ).normalize()
+
+        val edge = Kernel(3,3, listOf(
+            1.0, 0.0 , -1.0,
+            2.0, 0.0, -2.0,
+            1.0, 0.0 , -1.0
+        ) ).normalize()
+
+        val emboss = Kernel(3,3, listOf(
+            -2.0, -1.0 , 0.0,
+            -1.0, 1.0, 1.0,
+            0.0, 1.0 , 2.0
+        ) ).normalize()
+    }
+}
+
+data class KernelFilter(val kernel: Kernel): Transformation {
+    //3
+    // for every pixel in the image
+    //  create a window(x,y,kernel.width,kernel.height)
+    //  multiply the kernel with the window you just made -> return a new pixel
+    //  set the resulting pixel in the resulting image
+    override fun invoke(image: Image): Image =
+        Image.fromColors(
+            image.width,
+            image.height,
+            (0 ..<image.width).flatMap { x ->
+                (0 ..< image.height).map {  y ->
+                    kernel * image.window(x, y, kernel.width, kernel.height)
+                }
+            }
+        )
+    /*override fun invoke(image: Image): Image {
+        val resultingImage = Image.black(image.width, image.height)
+
+        (0 ..<image.width).flatMap { x ->
+            (0 ..< image.height).map {  y ->
+                val window = image.window(x,y,image.width, image.height)
+                val newPixel = kernel.times(window)
+                resultingImage.setColor(x, y, newPixel)
+            }
+        }
+
+        for(x in 0..<image.width){
+            for(y in 0 ..< image.height){
+                val window = image.window(x,y,image.width, image.height)
+                val newPixel = kernel.times(window)
+                resultingImage.setColor(x, y, newPixel)
+            }
+        }
+        return resultingImage
+    }*/
+
+
 }

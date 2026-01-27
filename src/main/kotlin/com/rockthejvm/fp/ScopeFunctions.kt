@@ -2,7 +2,7 @@ package org.example.com.rockthejvm.fp
 
 object ScopeFunctions {
 
-    fun obtainExternalList = listOf(1,2,3,4,5)
+    fun obtainExternalList() = listOf(1,2,3,4,5)
 
     fun demoLet(){
         val numbers = obtainExternalList()
